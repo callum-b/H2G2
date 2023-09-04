@@ -5,3 +5,4 @@
 ## TO TEST
  * Try WGAN-GP
  * Like, all the other models mentioned in the manuscript
+ * Split genome with no max size, play around with min size / min dist between hotspots
