@@ -207,7 +207,7 @@ def generate_real_samples(data, n) :
 def generate_fake_samples(g_model, latent, n) :
     return g_model(generate_latent_points(latent, n)), np.ones((n,1))
 
-def wgan(input_data, ae_act="linear", latent_dim_size=10000):
+def wgan(input_data, my_activation="relu", ae_act="linear", latent_dim_size=10000):
     """
     Create unconstrained WGAN model, and return it and its two components 
     input_data is numerical, each row contains a sample, each column a variable
@@ -222,11 +222,11 @@ def wgan(input_data, ae_act="linear", latent_dim_size=10000):
     hidden_c_3_size = math.ceil(input_size/100)
 
     critic_input = tf.keras.layers.Input(shape=(input_size, ))
-    c_hidden_1 = tf.keras.layers.Dense(hidden_c_1_size, activation='relu')(critic_input)
+    c_hidden_1 = tf.keras.layers.Dense(hidden_c_1_size, activation=my_activation)(critic_input)
     c_drop_1 = tf.keras.layers.Dropout(0.4)(c_hidden_1)
-    c_hidden_2 = tf.keras.layers.Dense(hidden_c_2_size, activation='relu')(c_drop_1)
+    c_hidden_2 = tf.keras.layers.Dense(hidden_c_2_size, activation=my_activation)(c_drop_1)
     c_drop_2 = tf.keras.layers.Dropout(0.4)(c_hidden_2)
-    c_hidden_3 = tf.keras.layers.Dense(hidden_c_3_size, activation='relu')(c_drop_2)
+    c_hidden_3 = tf.keras.layers.Dense(hidden_c_3_size, activation=my_activation)(c_drop_2)
     critic_output = tf.keras.layers.Dense(1, activation='linear')(c_hidden_3)
 
     critic_model = tf.keras.models.Model(critic_input, critic_output)
@@ -242,11 +242,11 @@ def wgan(input_data, ae_act="linear", latent_dim_size=10000):
     hidden_g_3_size = math.ceil(input_size/10)
 
     generator_input = tf.keras.layers.Input(latent_dim_size)
-    g_hidden_1 = tf.keras.layers.Dense(hidden_g_3_size, activation='relu')(generator_input)
+    g_hidden_1 = tf.keras.layers.Dense(hidden_g_3_size, activation=my_activation)(generator_input)
     g_drop_1 = tf.keras.layers.Dropout(0.4)(g_hidden_1)
-    g_hidden_2 = tf.keras.layers.Dense(hidden_g_2_size, activation='relu')(g_drop_1)
+    g_hidden_2 = tf.keras.layers.Dense(hidden_g_2_size, activation=my_activation)(g_drop_1)
     g_drop_2 = tf.keras.layers.Dropout(0.4)(g_hidden_2)
-    g_hidden_3 = tf.keras.layers.Dense(hidden_g_1_size, activation='relu')(g_drop_2)
+    g_hidden_3 = tf.keras.layers.Dense(hidden_g_1_size, activation=my_activation)(g_drop_2)
     generator_output = tf.keras.layers.Dense(input_size, activation=ae_act)(g_hidden_3)
 
     generator_model = tf.keras.models.Model(generator_input, generator_output)
