@@ -10,7 +10,7 @@
  * Sleep the VAEs to reduce latent space (!! watch out for mode searching !!)
 
 
-## WHAT I WANT TO TRY
+## WHAT I WOULD TRY IF STARTING OVER
  * Take ~1K top hotspots, with 10-100kb sparsity around them
  * Split with no maxsize
  * VAE 100x with sleeping, on 10?% chunks to optimise hyperparams (A LOT to try), test KLD to reduce mode searching?
