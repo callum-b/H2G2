@@ -66,7 +66,7 @@ def hap_count(mycells:list) -> int:
     return n
 
 
-def split_vcf(delim_f:str, SNPtable_f:str, out_dir:str, maxn=5000, minn=500, thrs=1, keep_excl=False) ->str:
+def split_vcf(delim_f:str, SNPtable_f:str, out_dir:str, maxn=5000, minn=500, thrs=1, keep_excl=False, sep_haplo=False) ->str:
     """
       splitvcf: take a gzipped input vcf file and split it into subsections based on a given list of delimiters, with params to define max and min numbers of mutations allowed per subsection, as well as a threshold for rare mutations
       does not load entire SNPtable in a dataframe because it can be VERY large
@@ -105,6 +105,8 @@ def split_vcf(delim_f:str, SNPtable_f:str, out_dir:str, maxn=5000, minn=500, thr
                         for item in data:
                             f.write("\t".join(item)+"\n")
                         f.close()
+                        if sep_haplo:
+                            vcf_to_haplo(filepath, filepath.sep(".")[0:-1] + "_haplo.vcf")
                         print("Writing done. Moving on...")
                         data = []
                         prev = delim # Forget previous hotspot only if used for output
@@ -117,6 +119,8 @@ def split_vcf(delim_f:str, SNPtable_f:str, out_dir:str, maxn=5000, minn=500, thr
                     for item in data:
                         f.write("\t".join(item)+"\n")
                     f.close()
+                    if sep_haplo:
+                        vcf_to_haplo(filepath, filepath.sep(".")[0:-1] + "_haplo.vcf")
                     prev = myline[1]
                     data = []
                     
@@ -127,6 +131,8 @@ def split_vcf(delim_f:str, SNPtable_f:str, out_dir:str, maxn=5000, minn=500, thr
         for item in data:
             f.write("\t".join(item)+"\n")
         f.close()
+        if sep_haplo:
+                vcf_to_haplo(filepath, filepath.sep(".")[0:-1] + "_haplo.vcf")
     else :
         filepath = out_dir + str(prev)+"_"+str(delim)+".vcf"
         f = open(filepath, 'a')
@@ -134,6 +140,8 @@ def split_vcf(delim_f:str, SNPtable_f:str, out_dir:str, maxn=5000, minn=500, thr
         for item in data:
             f.write("\t".join(item)+"\n")
         f.close()
+        if sep_haplo:
+                vcf_to_haplo(filepath, filepath.sep(".")[0:-1] + "_haplo.vcf")
         
     if keep_excl:
         excluded.close()
