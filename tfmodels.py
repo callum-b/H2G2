@@ -128,6 +128,9 @@ class VAE(tf.keras.Model):
         kl_loss = tf.reduce_mean(tf.reduce_sum(kl_loss, axis=1))
         ## BASE TOTAL LOSS:
         total_loss = reconstruction_loss + kl_loss
+        self.total_loss_tracker.update_state(total_loss)
+        self.reconstruction_loss_tracker.update_state(reconstruction_loss)
+        self.kl_loss_tracker.update_state(kl_loss)
         return {
             "loss": total_loss,
             "reconstruction_loss": reconstruction_loss,
