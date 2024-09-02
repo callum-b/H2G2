@@ -310,10 +310,10 @@ def train_wgan(wgan_model, critic_model, generator_model, input_data, out_dir:st
             critic_model.save(out_dir+"critic")
             wgan_model.save(out_dir+"WGAN")
             wgan_model.save(out_dir+"WGAN/GAN.h5")
-            with open(out_dir + "GAN_chr1/c_history.txt", 'w') as f:
+            with open(out_dir + "WGAN/c_history.txt", 'w') as f:
                 for item in c_history:
                     f.write("%s\n" % item)
-            with open(out_dir + "GAN_chr1/g_history.txt", 'w') as f:
+            with open(out_dir + "WGAN/g_history.txt", 'w') as f:
                 for item in g_history:
                     f.write("%s\n" % item)
             if verbose:
@@ -326,10 +326,10 @@ def train_wgan(wgan_model, critic_model, generator_model, input_data, out_dir:st
             critic_model.save(check_dir+"critic")
             wgan_model.save(check_dir+"WGAN")
             wgan_model.save(check_dir+"WGAN/GAN.h5")
-            with open(check_dir + "GAN_chr1/c_history.txt", 'w') as f:
+            with open(check_dir + "WGAN/c_history.txt", 'w') as f:
                 for item in c_history:
                     f.write("%s\n" % item)
-            with open(check_dir + "GAN_chr1/g_history.txt", 'w') as f:
+            with open(check_dir + "WGAN/g_history.txt", 'w') as f:
                 for item in g_history:
                     f.write("%s\n" % item)
             if verbose:
@@ -340,10 +340,10 @@ def train_wgan(wgan_model, critic_model, generator_model, input_data, out_dir:st
     critic_model.save(out_dir+"critic")
     wgan_model.save(out_dir+"WGAN")
     wgan_model.save(out_dir+"WGAN/GAN.h5")
-    with open(out_dir + "GAN_chr1/c_history.txt", 'w') as f:
+    with open(out_dir + "WGAN/c_history.txt", 'w') as f:
         for item in c_history:
             f.write("%s\n" % item)
-    with open(out_dir + "GAN_chr1/g_history.txt", 'w') as f:
+    with open(out_dir + "WGAN/g_history.txt", 'w') as f:
         for item in g_history:
             f.write("%s\n" % item)
     if verbose:
