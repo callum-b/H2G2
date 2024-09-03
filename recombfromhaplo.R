@@ -31,14 +31,8 @@ colnames(SNP_distances) = c("chr", "start", "end", "score")
 SNP_distances_gr = makeGRangesFromDataFrame(SNP_distances, TRUE, TRUE)
 
 # read distances from chromosomal map as GRanges
-distances = read.csv(map_file, header=1, sep=" ")
-colnames(distances) = c("start", "cMperMb", "cMatstart")
-endpos = distances$start 
-endpos = c(endpos[2:length(endpos)], endpos[length(endpos)])
-distances$end = endpos -1
-distances$chr = rep("chr1", length(endpos))
-distances = distances[,c(5,1,4,2,3)]
-
+distances = read.csv(map_file, skip=1, header=FALSE, sep=" ")
+colnames(distances) = c("chr", "start", "end", "cMperMb")
 distances_gr = makeGRangesFromDataFrame(distances, TRUE, TRUE)
 
 
