@@ -9,13 +9,14 @@ print(args)
 if (length(args)==0) {
 	stop("Please provide working directory, section for analysis and chromosomal map.n", call.=FALSE)
 } else {
-    work_dir = args[1]
-	section = args[2]
-    map_file = args[3]
+    in_dir = args[1]
+    out_dir = args[2]
+    section = args[3]
+    map_file = args[4]
 }
 
-in_path = paste(work_dir, "haplo_", section, ".txt", sep="")
-out_path = paste(work_dir, "recomb_", section, ".txt", sep="")
+in_path = paste(in_dir, section, "_haplo.vcf", sep="")
+out_path = paste(out_dir, "recomb_", section, ".txt", sep="")
 
 # read positions of mutations in section for study as GRanges object
 # score is recomb rate expressed in Morgan per bp, will be calculated later in script
