@@ -106,7 +106,7 @@ def split_vcf(delim_f:str, SNPtable_f:str, out_dir:str, maxn=5000, minn=500, thr
                             f.write("\t".join(item)+"\n")
                         f.close()
                         if sep_haplo:
-                            vcf_to_haplo(filepath, filepath.split(".")[0:-1] + "_haplo.vcf")
+                            vcf_to_haplo(filepath, filepath.split(".")[0] + "_haplo.vcf")
                         print("Writing done. Moving on...")
                         data = []
                         prev = delim # Forget previous hotspot only if used for output
@@ -120,7 +120,7 @@ def split_vcf(delim_f:str, SNPtable_f:str, out_dir:str, maxn=5000, minn=500, thr
                         f.write("\t".join(item)+"\n")
                     f.close()
                     if sep_haplo:
-                        vcf_to_haplo(filepath, filepath.split(".")[0:-1] + "_haplo.vcf")
+                        vcf_to_haplo(filepath, filepath.split(".")[0] + "_haplo.vcf")
                     prev = myline[1]
                     data = []
                     
@@ -132,7 +132,7 @@ def split_vcf(delim_f:str, SNPtable_f:str, out_dir:str, maxn=5000, minn=500, thr
             f.write("\t".join(item)+"\n")
         f.close()
         if sep_haplo:
-                vcf_to_haplo(filepath, filepath.split(".")[0:-1] + "_haplo.vcf")
+                vcf_to_haplo(filepath, filepath.split(".")[0] + "_haplo.vcf")
     else :
         filepath = out_dir + str(prev)+"_"+str(delim)+".vcf"
         f = open(filepath, 'a')
@@ -141,7 +141,7 @@ def split_vcf(delim_f:str, SNPtable_f:str, out_dir:str, maxn=5000, minn=500, thr
             f.write("\t".join(item)+"\n")
         f.close()
         if sep_haplo:
-                vcf_to_haplo(filepath, filepath.split(".")[0:-1] + "_haplo.vcf")
+                vcf_to_haplo(filepath, filepath.split(".")[0] + "_haplo.vcf")
         
     if keep_excl:
         excluded.close()
