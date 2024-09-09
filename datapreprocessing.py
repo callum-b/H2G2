@@ -120,7 +120,7 @@ def split_vcf(delim_f:str, SNPtable_f:str, out_dir:str, maxn=5000, minn=500, thr
                         f.write("\t".join(item)+"\n")
                     f.close()
                     if sep_haplo:
-                        vcf_to_haplo(filepath, filepath.spit(".")[0:-1] + "_haplo.vcf")
+                        vcf_to_haplo(filepath, filepath.split(".")[0:-1] + "_haplo.vcf")
                     prev = myline[1]
                     data = []
                     
