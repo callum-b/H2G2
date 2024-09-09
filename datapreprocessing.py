@@ -76,6 +76,7 @@ def split_vcf(delim_f:str, SNPtable_f:str, out_dir:str, maxn=5000, minn=500, thr
         return "You've mixed up the max and min arguments, you pinstriped barbarian!"
     delims = list([int(x.split('\t')[1]) for x in open(delim_f).readlines()])
     delims.sort()
+    delims.append("248956422")
     
     with gzip.open(SNPtable_f, "rt") as csvfile:
         header = "#HEADER NOT FOUND :("
