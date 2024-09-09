@@ -37,7 +37,7 @@ def recombproba_to_hotspots(probamap_f:str, chromosome:str, mindist=10000, thrs=
       recombproba_to_hotspots: take a file describing the recombination probabilities over a whole chromosome (like the maps provided in Halldorsson et al., 2019),
         and keep the centres of high likelihood sections to create a list of hotspots
     """
-    hotspots = pd.read_table(probamap_f, header=None)
+    hotspots = pd.read_table(probamap_f, skiprows=1, sep=" ", header=None)
     hotspots.columns = ["Chromosome", "Start", "End", "Score"]
     hotspots = hotspots.loc[hotspots.Chromosome == chromosome]
     hotspots = pr.PyRanges(hotspots[hotspots.Score>=thrs])
@@ -120,7 +120,7 @@ def split_vcf(delim_f:str, SNPtable_f:str, out_dir:str, maxn=5000, minn=500, thr
                         f.write("\t".join(item)+"\n")
                     f.close()
                     if sep_haplo:
-                        vcf_to_haplo(filepath, filepath.sep(".")[0:-1] + "_haplo.vcf")
+                        vcf_to_haplo(filepath, filepath.spit(".")[0:-1] + "_haplo.vcf")
                     prev = myline[1]
                     data = []
                     
