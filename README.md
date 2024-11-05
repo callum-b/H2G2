@@ -19,22 +19,36 @@ However, I also included a Snakemake pipeline which can run all these steps in s
 
 ### Installing Snakemake and its environment
 After cloning this github repo, you'll need to create the mamba environment required to run the scripts. Micromamba installation instructions are found on its host doc site: https://mamba.readthedocs.io/en/latest/installation/micromamba-installation.html
+
 Use micromamba to create the environment described in the config file: 
+
     `micromamba create -f h2g2.yaml`
+    
 Activate the mamba environment you just created:
+
     `micromamba activate h2g2`
-Use pip to install the packages that were not installed via micromamba:
+Use pip to install the packages that were not instal
+led via micromamba:
+
     `pip3 install pyranges tensorflow==2.12.0`
+    
 You should now be ready to run the snakemake pipeline.
 
 ### Snakemake rules
 The Snakemake pipeline is defined in the `Snakefile`. It contains all the individual rules used to run each software, as well as "big picture" rules that will run a batch of them at a time.
+
 As long as you are running the pipeline with default parameters, you will not need to modify anything in the `config.yaml` configuration file. 
+
 First, run `snakemake --cores=4 collect_and_split_data` which will create haplotypic vcf files for each subsection along chromosome 1.
+
 Once you have those, you should create the subdirectory `DATA/VCF/chr1/chunks_1Mb`, and populate it with the files for the Mb of data processed for the publication: `cp DATA/VCF/chr1/2??????_*_haplo.vcf DATA/VCF/chr1/chunks_1Mb/`. To save disk space, you can then gzip all the unused vcf files using parallel: `parallel gzip ::: DATA/VCF/chr1/*vcf &`
+
 Then you can run `snakemake --cores=4 wgan_some_sections`, which will train a WGAN model on those 1Mb of haplotypic vcf files. Thsi training step is quite long, and is prone to failure. I recommend looking at a graph of the the critic and generator loss over the training steps to select a checkpoint that seems appropriate, or re-running this training if it seems unsatisfactory.
+
 That will also create 1000 (by default) simulated haplotypic genomes, which can be used to test the realism of the generated samples.
+
 `snakemake --cores=4 paint_part_chromosome_autodetect` will prepare the necessary datafiles for chromopainter and run it on them, which will allow you to view the reconstructed ancestry of the simulated genomes.
+
 All other evaluation metrics were determined using classical methods like PCA or Hamming distances, which can be implemented quite easily in python.
 
 ## License
