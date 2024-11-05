@@ -39,15 +39,31 @@ The Snakemake pipeline is defined in the `Snakefile`. It contains all the indivi
 
 As long as you are running the pipeline with default parameters, you will not need to modify anything in the `config.yaml` configuration file. 
 
-First, run `snakemake --cores=4 collect_and_split_data` which will create haplotypic vcf files for each subsection along chromosome 1.
+First, run 
 
-Once you have those, you should create the subdirectory `DATA/VCF/chr1/chunks_1Mb`, and populate it with the files for the Mb of data processed for the publication: `cp DATA/VCF/chr1/2??????_*_haplo.vcf DATA/VCF/chr1/chunks_1Mb/`. To save disk space, you can then gzip all the unused vcf files using parallel: `parallel gzip ::: DATA/VCF/chr1/*vcf &`
+`snakemake --cores=4 collect_and_split_data` 
 
-Then you can run `snakemake --cores=4 wgan_some_sections`, which will train a WGAN model on those 1Mb of haplotypic vcf files. Thsi training step is quite long, and is prone to failure. I recommend looking at a graph of the the critic and generator loss over the training steps to select a checkpoint that seems appropriate, or re-running this training if it seems unsatisfactory.
+which will create haplotypic vcf files for each subsection along chromosome 1.
+
+Once you have those, you should create the subdirectory `DATA/VCF/chr1/chunks_1Mb`, and populate it with the files for the Mb of data processed for the publication: 
+
+`cp DATA/VCF/chr1/2??????_*_haplo.vcf DATA/VCF/chr1/chunks_1Mb/`
+
+To save disk space, you can then gzip all the unused vcf files using parallel: 
+
+`parallel gzip ::: DATA/VCF/chr1/*vcf &`
+
+Then you can run 
+
+`snakemake --cores=4 wgan_some_sections`
+
+which will train a WGAN model on those 1Mb of haplotypic vcf files. Thsi training step is quite long, and is prone to failure. I recommend looking at a graph of the the critic and generator loss over the training steps to select a checkpoint that seems appropriate, or re-running this training if it seems unsatisfactory.
 
 That will also create 1000 (by default) simulated haplotypic genomes, which can be used to test the realism of the generated samples.
 
-`snakemake --cores=4 paint_part_chromosome_autodetect` will prepare the necessary datafiles for chromopainter and run it on them, which will allow you to view the reconstructed ancestry of the simulated genomes.
+`snakemake --cores=4 paint_part_chromosome_autodetect` 
+
+will prepare the necessary datafiles for chromopainter and run it on them, which will allow you to view the reconstructed ancestry of the simulated genomes.
 
 All other evaluation metrics were determined using classical methods like PCA or Hamming distances, which can be implemented quite easily in python.
 
