@@ -22,15 +22,15 @@ After cloning this github repo, you'll need to create the mamba environment requ
 
 Use micromamba to create the environment described in the config file: 
 
-    `micromamba create -f h2g2.yaml`
+    micromamba create -f h2g2.yaml
     
 Activate the mamba environment you just created:
 
-    `micromamba activate h2g2`
+    micromamba activate h2g2
 Use pip to install the packages that were not instal
 led via micromamba:
 
-    `pip3 install pyranges tensorflow==2.12.0`
+    pip3 install pyranges tensorflow==2.12.0
     
 You should now be ready to run the snakemake pipeline.
 
@@ -41,27 +41,27 @@ As long as you are running the pipeline with default parameters, you will not ne
 
 First, run 
 
-    `snakemake --cores=4 collect_and_split_data` 
+    snakemake --cores=4 collect_and_split_data
 
 which will create haplotypic vcf files for each subsection along chromosome 1.
 
 Once you have those, you should create the subdirectory `DATA/VCF/chr1/chunks_1Mb`, and populate it with the files for the Mb of data processed for the publication: 
 
-    `cp DATA/VCF/chr1/2??????_*_haplo.vcf DATA/VCF/chr1/chunks_1Mb/`
+    cp DATA/VCF/chr1/2??????_*_haplo.vcf DATA/VCF/chr1/chunks_1Mb/
 
 To save disk space, you can then gzip all the unused vcf files using parallel: 
 
-    `parallel gzip ::: DATA/VCF/chr1/*vcf &`
+    parallel gzip ::: DATA/VCF/chr1/*vcf &
 
 Then you can run 
 
-    `snakemake --cores=4 wgan_some_sections`
+    snakemake --cores=4 wgan_some_sections
 
 which will train a WGAN model on those 1Mb of haplotypic vcf files. Thsi training step is quite long, and is prone to failure. I recommend looking at a graph of the the critic and generator loss over the training steps to select a checkpoint that seems appropriate, or re-running this training if it seems unsatisfactory.
 
 That will also create 1000 (by default) simulated haplotypic genomes, which can be used to test the realism of the generated samples.
 
-    `snakemake --cores=4 paint_part_chromosome_autodetect` 
+    snakemake --cores=4 paint_part_chromosome_autodetect
 
 will prepare the necessary datafiles for chromopainter and run it on them, which will allow you to view the reconstructed ancestry of the simulated genomes.
 
