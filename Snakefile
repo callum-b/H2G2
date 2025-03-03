@@ -52,25 +52,30 @@ def get_sections_wgan_encoded_subdir(wildcards):
 ### BIG PICTURE RULES ###
 
 rule collect_and_split_data:
+    """Collects raw VCF data and splits it into haplotypic sections based on predefined loci"""
     input:
         expand("DATA/VCF/{chromosome}/ALL_split_haplo.txt", chromosome=config.get("chromosomes_to_process", ["chr1"]))
 
 rule wgan_all_sections:
+	"""Trains a WGAN model on a whole chromosome, attempting to create realistic haplotypic genomes"""
     input:
         expand("DATA/MODELS/{chromosome}/WGAN.weights.h5", chromosome=config.get("chromosomes_to_process", ["chr1"]))
 
 rule wgan_some_sections:
+    """Trains a WGAN model on 1Mb sections of encoded haplotypic VCF data to generate realistic haplotypic genomes"""
     input:
         expand("DATA/MODELS/{chromosome}/chunks_1Mb/WGAN.weights.h5", chromosome=config.get("chromosomes_to_process", ["chr1"]))
 
 rule paint_full_chromosome_autodetect:
+	"""Prepares a whole chromosome of data for Chromopainter and runs it to reconstruct ancestry of simulated genomes"""
     input:
         expand("DATA/CHROMOPAINTER/{chromosome}/{section}/out_{section}_vae.samples.out", 
             chromosome=config.get("chromosomes_to_process", ["chr1"]), 
             section=[x.split("/")[-1].replace("_haplo_encoded_sampling_wgan_gen.csv", "") for x in glob.glob("DATA/GENERATED/chr1/*_haplo_encoded_sampling_wgan_gen.csv")] 
              )
 
-rule paint_part_chromosome_autodetect:
+rule paint_part_chromosome_autodetect::
+    """Prepares 1Mb of data for Chromopainter and runs it to reconstruct ancestry of simulated genomes"""
     input:
         expand("DATA/CHROMOPAINTER/{chromosome}/{section}_vae/out_{section}_vae.samples.out", 
             chromosome=config.get("chromosomes_to_process", ["chr1"]), 
@@ -82,6 +87,7 @@ rule paint_part_chromosome_autodetect:
 ## PUBLIC DATA PREPROCESSING ##
 
 rule download_genomes_lowygallego:
+	"""Obtain 1000 Genomes Project data realigned onto HG38 as published by Lowy-Gallego (2019)"""
     output:
         "DATA/VCF/ALL_{chrom}_shapeit2_integrated_snvindels_v2a_27022019_GRCh38_phased.vcf.gz"
     log:
@@ -90,6 +96,7 @@ rule download_genomes_lowygallego:
         "touch {output}; wget -O {output} http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/1000_genomes_project/release/20190312_biallelic_SNV_and_INDEL/ALL.{wildcards.chrom}.shapeit2_integrated_snvindels_v2a_27022019.GRCh38.phased.vcf.gz "
 
 rule recomb_halldorsson_to_filt_bed:
+	"""Process supplemental data from Halldorsson (2019) into 1bp recombination hotspots (above a certain threshold)"""
     input:
         "DATA/BED/aau1043_datas3.gz" # can be obtained at https://www.science.org/doi/suppl/10.1126/science.aau1043/suppl_file/aau1043_datas3.gz (can't use wget though unfortunately :/ )
     output:
@@ -102,6 +109,7 @@ rule recomb_halldorsson_to_filt_bed:
         "echo 'type=bedGraph' > {output}; gunzip -c {input} | tail -n +9 | awk '{{ if(int($4)>{params.thrs}) {{ print $1, $2, $3, $4}} }}' >> {output}"
         
 rule recomb_halldorsson_to_bed:
+	"""Process supplemental data from Halldorsson (2019) into 1bp recombination hotspots (all sections)"""
     input:
         "DATA/BED/aau1043_datas3.gz" # can be obtained at https://www.science.org/doi/suppl/10.1126/science.aau1043/suppl_file/aau1043_datas3.gz (can't use wget though unfortunately :/ )
     output:
@@ -112,6 +120,7 @@ rule recomb_halldorsson_to_bed:
         "echo 'type=bedGraph' > {output}; gunzip -c {input} | tail -n +9 | awk '{{ print $1, $2, $3, $4}}' >> {output}"
 
 rule remove_neighbour_hotspots:
+	"""Remove hotspots within 10kb of a higher intensity hotspot"""
     input:
         "DATA/BED/genetic_map_sexavg_nosmall.bdg"
     output:
@@ -125,6 +134,7 @@ rule remove_neighbour_hotspots:
         datapreprocessing.recombproba_to_hotspots(input[0], wildcards.chrom, int(params.dist), int(params.thrs)).to_bed(output[0])
 
 rule separate_vcf_hotspots:
+	"""Separate a vcf file of genomic data into subsections based on delimiters"""
     input:
         mutations="DATA/VCF/{data}_{chrom}_shapeit2_integrated_snvindels_v2a_27022019_GRCh38_phased.vcf.gz",
         hotspots="DATA/BED/genetic_map_sexavg_hotspots_{chrom}.bdg"
@@ -142,6 +152,7 @@ rule separate_vcf_hotspots:
         shell("touch {output}")
 
 rule separate_vcf_hotspots_haplo:
+	"""Separate a vcf file of genomic data into haplotypic subsections based on delimiters"""
     input:
         mutations="DATA/VCF/{data}_{chrom}_shapeit2_integrated_snvindels_v2a_27022019_GRCh38_phased.vcf.gz",
         hotspots="DATA/BED/genetic_map_sexavg_hotspots_{chrom}.bdg"
@@ -161,6 +172,7 @@ rule separate_vcf_hotspots_haplo:
         shell("touch {output.haplo}")
 
 rule haplo_section_auto:
+	"""Split genomes in a vcf file into haplotypes"""
     input:
         "DATA/VCF/{chrom}/{section}.vcf"
     output:
@@ -173,6 +185,7 @@ rule haplo_section_auto:
 ## ENCODING AND DECODING ##
 
 rule autoencode_section:
+	"""Create and train an autoencoder on a vcf data file"""
     input:
         "DATA/VCF/{chrom}/{section}_haplo.vcf"
     output:
@@ -186,6 +199,7 @@ rule autoencode_section:
         "python3 SCRIPTS/autoencode.py {input} {output.data_enc} {output.data_dec} {output.model_enc} {output.model_dec}"
 
 rule VAE_section:
+	"""Create and train a variational autoencoder on a vcf data file"""
     input:
         "DATA/VCF/{chrom}/{section}_haplo.vcf"
     output:
@@ -204,6 +218,7 @@ rule VAE_section:
         "{output.model_enc} {output.model_dec}"
 
 rule decode_encoded:
+	"""Decode an encoded data file"""
     input:
         model_dec="DATA/MODELS/{chrom}/dec_{type}_{section}.keras",
         data_enc="DATA/ENCODED/{chrom}/{section}_haplo_encoded_sampling_wgan_gen.csv",
@@ -216,6 +231,7 @@ rule decode_encoded:
         "python3 SCRIPTS/decode.py {input.model_dec} {input.data_enc} {input.data_ref} {output}"
 
 rule decode_generated:
+	"""Decode a data file generated by a WGAN"""
     input:
         model_dec="DATA/MODELS/{chrom}/dec_{type}_{section}.keras",
         data_enc="DATA/GENERATED/{chrom}/{section}_haplo_encoded_sampling_wgan_gen.csv",
@@ -230,6 +246,7 @@ rule decode_generated:
 ## MANAGING DATA ##
 
 rule symlink_csv:
+	"""Create a symlink to a csv file (experimental)"""
     input:
         "DATA/{type}/{chrom}/{filename}.csv"
     output:
@@ -240,6 +257,7 @@ rule symlink_csv:
         "ln -s "+working_dir+"/{input} {output}"
 
 rule symlink_vcf:
+	"""Create a symlink to a vcf file (experimental)"""
     input:
         "DATA/{type}/{chrom}/{filename}.vcf"
     output:
@@ -250,6 +268,7 @@ rule symlink_vcf:
         "ln -s "+working_dir+"/{input} {output}"
 
 rule gunzip_vcf:
+	"""Unzip a vcf file (useful if you have gzipped a vcf file to save space)"""
     input:
         "DATA/VCF/{chrom}/{filename}.vcf.gz"
     output:
@@ -262,6 +281,7 @@ rule gunzip_vcf:
 ## TRAINING GENERATOR ##
 
 rule wgan_encoded_fullchr:
+	"""Create and train a WGAN on an entire chromosome"""
     input:
         get_sections_wgan_encoded_fullchr
     output:
@@ -277,6 +297,7 @@ rule wgan_encoded_fullchr:
         "python3 SCRIPTS/wgan_encoded.py {params.train_steps} {params.train_save_steps} {params.train_check_steps} {params.output_samples} {output.model} {input}"
 
 rule wgan_encoded_subdir:
+	"""Create and train a WGAN on an 1Mb sections"""
     input:
         get_sections_wgan_encoded_subdir
     output: 
@@ -294,6 +315,7 @@ rule wgan_encoded_subdir:
 ## ANALYSING RESULTS ##
 
 rule chromopainter_prep:
+	"""Prepare data for processing by chromopainter"""
     input:
         data_dec="DATA/GENERATED/{chrom}/{section}_{type}_haplo_encoded_sampling_wgan_gen_decoded.vcf",
         data_ref="DATA/VCF/{chrom}/{section}_haplo.vcf"
@@ -309,6 +331,7 @@ rule chromopainter_prep:
         datapreprocessing.prepare_chromopainter(input.data_ref, input.data_dec, "DATA/ETH/1KG_eth.txt", "DATA/CHROMOPAINTER/"+wildcards.chrom+"/"+wildcards.section+"_"+wildcards.type+"/",  params.n_sim)
 
 rule chromopainter_recomb:
+	"""Create recombination file for Chromopainter"""
     input:
         proba_map="DATA/BED/genetic_map_sexavg.bdg",
         chromo_haplo="DATA/CHROMOPAINTER/{chrom}/{section}_vae/haplo.txt"
@@ -320,6 +343,7 @@ rule chromopainter_recomb:
         "Rscript SCRIPTS/recombfromhaplo.R DATA/CHROMOPAINTER/{wildcards.chrom}/ DATA/CHROMOPAINTER/{wildcards.chrom}/ {wildcards.section} {input.proba_map}"
 
 rule paint_chromo:
+	"""Create reconstructed ancestry for genomes using Chromopainter"""
     input:
         donor="DATA/CHROMOPAINTER/{chrom}/{section}_{type}/donor.txt",
         haplo="DATA/CHROMOPAINTER/{chrom}/{section}_{type}/haplo.txt",
