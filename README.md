@@ -4,7 +4,7 @@ Haplotypic Human Genome Generator
 This is the main product of my PhD project: a way to generate haplotypic human genomic data, based on a reference dataset.
 
 ## Project
-The full details of this project are available as a biorXiv preprint. Read it here: https://www.biorxiv.org/content/10.1101/2023.12.08.570767v1.full
+The full details of this project are available as a publication in Nucleic Acids Research: Genomics & Bioinformatics. Read it here: https://doi.org/10.1093/nargab/lqaf101 
 
 ## How to use 
 The scripts included here can be ran independantly. The main steps are:
